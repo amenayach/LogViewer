@@ -191,6 +191,7 @@
             this.grd.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.grd.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grd.Location = new System.Drawing.Point(0, 0);
+            this.grd.MultiSelect = false;
             this.grd.Name = "grd";
             this.grd.ReadOnly = true;
             this.grd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -204,10 +205,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(771, 493);
             this.Controls.Add(this.splitContainer1);
+            this.Icon = global::LogViewer.Properties.Resources.logicon;
             this.KeyPreview = true;
             this.Name = "MainForm";
             this.Text = "Log Viewer";
-            this.Icon = Properties.Resources.logicon;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
