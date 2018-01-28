@@ -48,7 +48,7 @@ namespace LogViewer
             }
             else if (File.Exists(fileName))
             {
-                cmbFiles.Items.Clear();
+                cmbFiles.Items?.Clear();
 
                 FillFilesDropdown(new[] { new FileInfo(fileName) });
 
@@ -225,6 +225,45 @@ namespace LogViewer
             if (e.KeyCode == Keys.F3)
             {
                 tbSearch.Focus();
+            }
+            else if (e.Control && e.KeyCode == Keys.O)
+            {
+                btnBrowse_Click(sender, e);
+            }
+            else if (e.KeyCode == Keys.Enter && grd.SelectedRows != null && grd.SelectedRows.Count == 1)
+            {
+                var richText = new RichTextBox();
+                var form = new Form();
+                form.Width = this.Width * 2 / 3;
+                form.Height = this.Height * 2 / 3;
+                //form.ControlBox = false;
+                //form.ShowInTaskbar = false;
+                form.StartPosition = FormStartPosition.CenterParent;
+
+                richText.Height = form.Height;
+                richText.Width = form.Width ;
+                richText.Enabled = false;
+                //richText.ReadOnly = true;
+                richText.Font = new Font(FontFamily.GenericSansSerif, 16, FontStyle.Regular);
+
+                var entry = ((List<EntryInfo>)grd.DataSource)[grd.SelectedRows[0].Index];
+
+                richText.Text = entry.ToString();
+
+                form.Controls.Add(richText);
+
+                form.KeyUp += Form_KeyUp;
+
+                form.ShowDialog();
+            }
+        }
+
+        private void Form_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (sender != null && e.KeyCode == Keys.Escape)
+            {
+                ((Form)sender).Close();
+                ((Form)sender).Dispose();
             }
         }
     }
