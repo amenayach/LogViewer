@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tbSearch = new System.Windows.Forms.TextBox();
             this.lblRecordCount = new System.Windows.Forms.Label();
@@ -40,6 +40,7 @@
             this.tbFilePath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.grd = new System.Windows.Forms.DataGridView();
+            this.chNotIn = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -58,6 +59,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.chNotIn);
             this.splitContainer1.Panel1.Controls.Add(this.tbSearch);
             this.splitContainer1.Panel1.Controls.Add(this.lblRecordCount);
             this.splitContainer1.Panel1.Controls.Add(this.label3);
@@ -181,12 +183,12 @@
             // 
             this.grd.AllowUserToAddRows = false;
             this.grd.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.DimGray;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White;
-            this.grd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.DimGray;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White;
+            this.grd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
             this.grd.BackgroundColor = System.Drawing.Color.White;
             this.grd.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.grd.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -197,6 +199,17 @@
             this.grd.Size = new System.Drawing.Size(771, 425);
             this.grd.TabIndex = 0;
             // 
+            // chNotIn
+            // 
+            this.chNotIn.AutoSize = true;
+            this.chNotIn.Location = new System.Drawing.Point(191, 38);
+            this.chNotIn.Name = "chNotIn";
+            this.chNotIn.Size = new System.Drawing.Size(54, 17);
+            this.chNotIn.TabIndex = 9;
+            this.chNotIn.Text = "&Not in";
+            this.chNotIn.UseVisualStyleBackColor = true;
+            this.chNotIn.CheckedChanged += new System.EventHandler(this.chNotIn_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -204,10 +217,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(771, 493);
             this.Controls.Add(this.splitContainer1);
+            this.Icon = global::LogViewer.Properties.Resources.logicon;
             this.KeyPreview = true;
             this.Name = "MainForm";
             this.Text = "Log Viewer";
-            this.Icon = Properties.Resources.logicon;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -237,6 +250,7 @@
         private System.Windows.Forms.ComboBox cmbFiles;
         private System.Windows.Forms.Label lblRecordCount;
         private System.Windows.Forms.TextBox tbSearch;
+        private System.Windows.Forms.CheckBox chNotIn;
     }
 }
 

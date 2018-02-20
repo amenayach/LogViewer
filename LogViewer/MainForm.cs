@@ -48,7 +48,7 @@ namespace LogViewer
             }
             else if (File.Exists(fileName))
             {
-                cmbFiles.Items.Clear();
+                cmbFiles.DataSource = null;
 
                 FillFilesDropdown(new[] { new FileInfo(fileName) });
 
@@ -72,12 +72,24 @@ namespace LogViewer
 
                     if (!string.IsNullOrWhiteSpace(keyword))
                     {
-                        records = records.Where(m =>
-                        m.Message?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
-                        m.Date.ToString("dd-MM-yyyy HH:mm:ss").IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
-                        m.Payload?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
-                        m.Url?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
-                        m.StackTrace?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1).ToList();
+                        if (!chNotIn.Checked)
+                        {
+                            records = records.Where(m =>
+                                                m.Message?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
+                                                m.Date.ToString("dd-MM-yyyy HH:mm:ss").IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
+                                                m.Payload?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
+                                                m.Url?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
+                                                m.StackTrace?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1).ToList(); 
+                        }
+                        else
+                        {
+                            records = records.Where(m =>
+                                                !(m.Message?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
+                                                m.Date.ToString("dd-MM-yyyy HH:mm:ss").IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
+                                                m.Payload?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
+                                                m.Url?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
+                                                m.StackTrace?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1)).ToList();
+                        }
                     }
 
                     grd.DataSource = records;
@@ -226,6 +238,11 @@ namespace LogViewer
             {
                 tbSearch.Focus();
             }
+        }
+
+        private void chNotIn_CheckedChanged(object sender, EventArgs e)
+        {
+            FillGrid(cmbFiles.SelectedValue as string);
         }
     }
 }
