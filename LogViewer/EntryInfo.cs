@@ -10,5 +10,15 @@ namespace LogViewer
         public string StackTrace { get; set; }
         public string Payload { get; set; }
         public string Url { get; set; }
+
+        public override string ToString()
+        {
+            return $@"Type: {this.Type}
+Date: {this.Date.ToShortDateString()}
+Message: {this.Message}
+StackTrace: {this.StackTrace}
+Payload: {this.Payload}
+Url: {this.Url}";
+        }
     }
 }

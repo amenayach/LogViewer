@@ -193,6 +193,7 @@
             this.grd.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.grd.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grd.Location = new System.Drawing.Point(0, 0);
+            this.grd.MultiSelect = false;
             this.grd.Name = "grd";
             this.grd.ReadOnly = true;
             this.grd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
