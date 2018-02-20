@@ -13,10 +13,12 @@ namespace LogViewer
 {
     public partial class MainForm : Form
     {
+        private bool lockEvents = false;
+
         public MainForm()
         {
             InitializeComponent();
-            cmbTypes.Text = "ALL";
+            cmbGroupBy.SelectedValueChanged += CmbGroupBy_SelectedValueChanged;
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
@@ -51,20 +53,29 @@ namespace LogViewer
                 cmbFiles.DataSource = null;
 
                 FillFilesDropdown(new[] { new FileInfo(fileName) });
-
-                FillGrid(fileName);
             }
         }
 
-        private void FillGrid(string fileName)
+        private void FillGrid(string fileName, bool clear = true)
         {
             try
             {
+                lockEvents = true;
                 grd.DataSource = null;
                 lblRecordCount.Text = "Reading...";
                 this.Enabled = false;
 
                 var records = LogReader.LoadFile(fileName);
+
+                if (clear)
+                {
+                    var groups = records.GroupBy(m => m.Message.Substring(0, Math.Min(m.Message.Length, 100)) + "...")
+                                        .Select(m => new { Group = m.Key }).ToList();
+                    groups.Insert(0, new { Group = "All" });
+                    cmbGroupBy.DataSource = groups;
+                    cmbGroupBy.DisplayMember = "Group";
+                    cmbGroupBy.ValueMember = "Group";
+                }
 
                 if (records?.Any() ?? false)
                 {
@@ -79,7 +90,7 @@ namespace LogViewer
                                                 m.Date.ToString("dd-MM-yyyy HH:mm:ss").IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
                                                 m.Payload?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
                                                 m.Url?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
-                                                m.StackTrace?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1).ToList(); 
+                                                m.StackTrace?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1).ToList();
                         }
                         else
                         {
@@ -90,6 +101,13 @@ namespace LogViewer
                                                 m.Url?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1 ||
                                                 m.StackTrace?.IndexOf(keyword, StringComparison.InvariantCultureIgnoreCase) > -1)).ToList();
                         }
+                    }
+
+                    var selectedGroup = ((string)cmbGroupBy.SelectedValue);
+
+                    if (!clear && selectedGroup != "All")
+                    {
+                        records = records.Where(m => m.Message.Contains(selectedGroup.Substring(0, selectedGroup.Length - 3))).ToList();
                     }
 
                     grd.DataSource = records;
@@ -105,6 +123,15 @@ namespace LogViewer
             finally
             {
                 this.Enabled = true;
+                lockEvents = false;
+            }
+        }
+
+        private void CmbGroupBy_SelectedValueChanged(object sender, EventArgs e)
+        {
+            if (!lockEvents && cmbGroupBy.DataSource != null && cmbGroupBy.SelectedValue != null)
+            {
+                FillGrid(cmbFiles.SelectedValue as string, false);
             }
         }
 
@@ -170,11 +197,6 @@ namespace LogViewer
             }
         }
 
-        private void cmbTypes_SelectedValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void MainForm_Load(object sender, EventArgs e)
         {
             var config = Config.Get();
@@ -195,7 +217,7 @@ namespace LogViewer
 
         private void cmbFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(cmbFiles.Text))
+            if (!lockEvents && !string.IsNullOrWhiteSpace(cmbFiles.Text))
             {
                 FillGrid(cmbFiles.SelectedValue as string);
             }
@@ -219,11 +241,6 @@ namespace LogViewer
             }
         }
 
-        private void cmbMsg_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            FillGrid(cmbFiles.SelectedValue as string);
-        }
-
         private void tbSearch_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -242,46 +259,46 @@ namespace LogViewer
             {
                 btnBrowse_Click(sender, e);
             }
-            else if (e.KeyCode == Keys.Enter && grd.SelectedRows != null && grd.SelectedRows.Count == 1)
+            else if (e.KeyCode == Keys.Enter && grd.SelectedRows != null && grd.SelectedRows.Count == 1 && grd.Focused)
             {
-                var richText = new RichTextBox();
-                var form = new Form();
-                form.Width = this.Width * 2 / 3;
-                form.Height = this.Height * 2 / 3;
-                //form.ControlBox = false;
-                //form.ShowInTaskbar = false;
-                form.StartPosition = FormStartPosition.CenterParent;
+                using (var form = new Form())
+                {
+                    form.WindowState = FormWindowState.Maximized;
+                    form.StartPosition = FormStartPosition.CenterParent;
+                    form.Icon = Properties.Resources.logicon;
+                    form.KeyPreview = true;
 
-                richText.Height = form.Height;
-                richText.Width = form.Width ;
-                richText.Enabled = false;
-                //richText.ReadOnly = true;
-                richText.Font = new Font(FontFamily.GenericSansSerif, 16, FontStyle.Regular);
+                    var richText = new RichTextBox
+                    {
+                        Height = form.Height,
+                        Width = form.Width,
+                        Dock = DockStyle.Fill,
+                        ReadOnly = true,
+                        Font = new Font(FontFamily.GenericSansSerif, 16, FontStyle.Regular)
+                    };
 
-                var entry = ((List<EntryInfo>)grd.DataSource)[grd.SelectedRows[0].Index];
+                    var entry = ((List<EntryInfo>)grd.DataSource)[grd.SelectedRows[0].Index];
 
-                richText.Text = entry.ToString();
+                    richText.Text = entry.ToString();
 
-                form.Controls.Add(richText);
+                    form.Controls.Add(richText);
 
-                form.KeyUp += Form_KeyUp;
+                    form.KeyUp += (formSender, keyEvent) =>
+                    {
+                        if (keyEvent.KeyCode == Keys.Escape)
+                        {
+                            form.Close();
+                        }
+                    };
 
-                form.ShowDialog();
-            }
-        }
-
-        private void Form_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (sender != null && e.KeyCode == Keys.Escape)
-            {
-                ((Form)sender).Close();
-                ((Form)sender).Dispose();
+                    form.ShowDialog();
+                }
             }
         }
 
         private void chNotIn_CheckedChanged(object sender, EventArgs e)
         {
-            FillGrid(cmbFiles.SelectedValue as string);
+            FillGrid(cmbFiles.SelectedValue as string, false);
         }
     }
 }
